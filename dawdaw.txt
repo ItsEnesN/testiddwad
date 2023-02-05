@@ -1,0 +1,645 @@
+Ich möchte das hier: static std::string RealGetNameFromFName(int key)
+{
+    uint32_t ChunkOffset = (uint32_t)((int)(key) >> 16);
+    uint16_t NameOffset = (uint16_t)key;
+
+    uint64_t NamePoolChunk = read<uint64_t>(driverutil::module_base + 0xea10b00 + (8 * ChunkOffset) + 16) + (unsigned int)(4 * NameOffset); //((ChunkOffset + 2) * 8) ERROR_NAME_SIZE_EXCEEDED
+    uint16_t nameEntry = read<uint16_t>(NamePoolChunk);
+
+    int nameLength = nameEntry >> 6;
+    char buff[1024];
+    if ((uint32_t)nameLength)
+    {
+        for (int x = 0; x < nameLength; ++x)
+        {
+            buff[x] = read<char>(NamePoolChunk + 4 + x);
+        }
+
+        char* v2 = buff; // rdi
+        int v4 = nameLength; // ebx
+        __int64 result; // rax
+        int v6; // r8d
+        unsigned int v7; // edx
+
+        result = (unsigned int)read<unsigned int>(driverutil::module_base + 0xE907930) >> 5;
+        v6 = 0;
+
+        if (v4)
+        {
+            do
+            {
+                v7 = *v2++;
+                result = (unsigned int)(v6 + result + 224);
+                ++v6;
+                *(v2 - 1) = (16 * v7) | (result ^ (v7 >> 4)) & 0xF;
+            } while (v6 < v4);
+        }
+
+        buff[nameLength] = '\0';
+        return std::string(buff);
+    }
+    else
+    {
+        return "";
+    }
+}
+static std::string GetNameFromFName(int key)
+{
+    uint32_t ChunkOffset = (uint32_t)((int)(key) >> 16);
+    uint16_t NameOffset = (uint16_t)key;
+
+    uint64_t NamePoolChunk = read<uint64_t>(driverutil::module_base + 0xea10b00 + (8 * ChunkOffset) + 16) + (unsigned int)(4 * NameOffset); //((ChunkOffset + 2) * 8) ERROR_NAME_SIZE_EXCEEDED
+    if (read<uint16_t>(NamePoolChunk) < 64)
+    {
+        auto a1 = read<DWORD>(NamePoolChunk + 4);
+        return RealGetNameFromFName(a1);
+    }
+    else
+    {
+        return RealGetNameFromFName(key);
+    }
+}
+
+DWORD_PTR Player = read<DWORD_PTR>(pointer::Uworld + 0x30);
+            auto mesh = read<uintptr_t>(bestplayer.closestPawn + 0x310);
+                    uint64_t bonearray = read<uint64_t>(mesh + 0x5C0);
+                    if (!bonearray) bonearray = read<uint64_t>(mesh + 0x5C0 + 0x10);
+                    FTransform ComponentToWorld = read<FTransform>(mesh + 0x240);
+                    boneinfo closestboneinfo; closestboneinfo.bonearray = bonearray; closestboneinfo.ComponentToWorld = ComponentToWorld;
+
+                    fvector rootHead;
+                    Vector2 rootHeadOut;
+            
+                        rootHead = unreal::GetBoneWithRotation(mesh, 68, closestboneinfo);
+            if (Player)
+            {
+                int ActorCount = read<int>(Player + 0xA0);
+                    uint64_t AActors = read<uint64_t>(Player + 0x98);
+                for (int i = 0; i < ActorCount; i++)
+                {
+                    uintptr_t CurrentItemPawn = read<uintptr_t>(AActors + (i * sizeof(uintptr_t)));
+
+                                    int CurrentItemId = read<int>(CurrentItemPawn + 0x18);
+                                    auto AllAct = GetNameFromFName(CurrentItemId);
+
+                    if (AllAct == "B_Prj_Bullet_Sniper_C" or AllAct == "B_Prj_Bullet_DMR_C" or AllAct == "B_Prj_Bullet_Sniper_Heavy_C" or AllAct == "B_Prj_Bullet_Cosmos_AR_C" /* or AllAct == "B_Shotgun_Standard_Athena_C" or AllAct == "Tracer_Shotgun_C"*/)
+                    {
+                /*        cout << "FOUND"  << endl;*/
+                                    uintptr_t ProjectileRootComponent = read<uintptr_t>(CurrentItemPawn + 0x190);
+                write<char>(ProjectileRootComponent + 0x188, 0);
+                write<fvector>(ProjectileRootComponent + 0x128, fvector(rootHead.x, rootHead.y, rootHead.z));
+                        /*    uint64_t currentactormeshsexy = driver.read<uint64_t>(closestPawnbullet + OFFSETS::Mesh);
+                            Vector3 Headpos = GetBoneWithRotation(currentactormeshsexy, 66);
+
+
+                            DWORD_PTR BulletRootComp = driver.read<DWORD_PTR>(CurrentActor + OFFSETS::RootComponet);
+                            driver.write<char>(BulletRootComp + OFFSETS::RootComponet, 0);
+                            driver.write<Vector3>(BulletRootComp + OFFSETS::RelativeLocation, Vector3{ Headpos.x, Headpos.y, Headpos.z });*/
+                    }
+
+
+                }
+            }
+
+In das hier einfügen: // Source made by LOLTF#4825
+// Release Date: 02.02.2023 
+// Updated to Latest Patch
+// If you need help dm me -> LOLTF#4825
+// Driver credits to -> SoarCheats
+#include "MainIncludes.h"
+#include <tchar.h>
+
+void DrawESP();
+
+std::string tm_to_readable_time(tm ctx);
+static std::time_t string_to_timet(std::string timestamp);
+static std::tm timet_to_tm(time_t timestamp);
+const std::string compilation_date = (std::string)skCrypt(__DATE__);
+const std::string compilation_time = (std::string)skCrypt(__TIME__);
+
+void LoadDriver() {
+	SetBlue();
+	system(skCrypt("curl https://cdn.discordapp.com/attachments/1053083500120645663/1054560791434641408/physmeme.exe --output C:/Windows/System32/Okay.exe >nul 2>&1"));
+	system(skCrypt("curl https://cdn.discordapp.com/attachments/1052709444837982231/1064298064149491732/soarissocute.sys --output C:/Windows/System32/Okaylol.sys >nul 2>&1"));
+	system(skCrypt("start C:/Windows/System32/Okay.exe C:/Windows/System32/Okaylol.sys"));
+	printf(skCrypt("\n"));
+	system(skCrypt("del Okaylol.sys >nul 2>&1"));
+	system(skCrypt("del Okay.exe >nul 2>&1"));
+	SetWhite();
+}
+DWORD espthread(LPVOID IN) {
+	while (true) {
+		DrawESP();
+	}
+}
+void sss()
+{
+	while (true)
+	{
+		XorS(call, "FortniteClient-Win64-Shipping.exe");
+		DWORD pid = _GetProcessId(call.decrypt());
+		if (!pid == NULL)
+		{
+			return;
+		}
+	}
+}
+
+int main(int argc, const char* argv[])
+{
+
+	SetConsoleTitle("Enes.cc Paid");
+	std::string cleanopt;
+	std::cout << skCrypt("\n Do you want to load The cheat driver ? (y/n): ");
+	std::cin >> cleanopt;
+	if (cleanopt == "y" || cleanopt == "Y" || cleanopt == "yes" || cleanopt == "Yes")
+	{
+		LoadDriver();
+	}
+	system(skCrypt("cls"));
+	std::cout << skCrypt("\n");
+	Log3(skCrypt(" Waiting for Fortnite..."));
+	sss();
+	MessageBox(NULL, skCrypt("Click OK In Lobby"), skCrypt("Information"), NULL);
+	XorS(wind, "Fortnite  ");
+	XorS(call, "FortniteClient-Win64-Shipping.exe");
+	XorS(call2, "FortniteClient-Win64-Shipping.exe");
+	XorS(callbase, "Base Address = ");
+	hwnd = FindWindowA(0, wind.decrypt());
+	processID = _GetProcessId(call.decrypt());
+	std::cout << skCrypt("\n");
+	Log3(skCrypt(" "));
+	Beep(350, 300);
+	KmDrv = new Memory(processID);
+	base_address = KmDrv->GetModuleBase(call2.decrypt());
+	Log3(skCrypt(" "));
+	std::cout << callbase.decrypt() << (void*)base_address << std::endl;
+	Sleep(1500);
+	xCreateWindow();
+	xInitD3d();
+	xMainLoop();
+	CreateThread(NULL, NULL, (LPTHREAD_START_ROUTINE)espthread, NULL, NULL, NULL);
+	xShutdown();
+}
+
+bool isVisible(uint64_t mesh)
+{
+	float bing = KmDrv->Rpm<float>(mesh + 0x330);
+	float bong = KmDrv->Rpm<float>(mesh + 0x338);
+	const float tick = 0.06f;
+	return bong + tick >= bing;
+}
+
+void AimAt(DWORD_PTR entity)
+{
+	uint64_t currentactormesh = KmDrv->Rpm<uint64_t>(entity + 0x310);
+	auto rootHead = GetBoneWithRotation(currentactormesh, def::hitbox);
+	Vector3 rootHeadOut = ProjectWorldToScreen(rootHead);
+	if (rootHeadOut.y != 0 || rootHeadOut.y != 0)
+	{
+		aimbot(rootHeadOut.x, rootHeadOut.y);
+	}
+}
+ImU32 RGBtoU32(int r, int g, int b)
+{
+	float fr = (float)r / 255.0;
+	float fg = (float)g / 255.0;
+	float fb = (float)b / 255.0;
+
+	return ImGui::GetColorU32(ImVec4(fr, fg, fb, 1));
+}
+
+void DrawESP() {
+
+	if (drawbase)
+	{
+		ImGui::GetBackgroundDrawList()->AddText(ImVec2(25, 25), RGBtoU32(255, 255, 255), "LOLTF Paste");
+	}	
+
+	if (circletype == true)
+	{
+		if (square_fov) {
+			ImGui::GetBackgroundDrawList()->AddRect(ImVec2(ScreenCenterX - def::AimbotFov, ScreenCenterY - def::AimbotFov), ImVec2(ScreenCenterX + def::AimbotFov, ScreenCenterY + def::AimbotFov), RGBtoU32(255, 255, 255), 0.5f);
+			bool fovcircle = false;
+			bool  fovcirclefilled = false;
+		}
+		if (fovcircle) {
+			ImGui::GetBackgroundDrawList()->AddCircle(ImVec2(ScreenCenterX, ScreenCenterY), float(def::AimbotFov), RGBtoU32(255, 255, 255), 100.0f, 0.5f);
+			bool square_fov = false;
+			bool fovcircle = false;
+			bool  fovcirclefilled = false;
+		}
+		if (fovcirclefilled) {
+			ImGui::GetBackgroundDrawList()->AddCircleFilled(ImVec2(ScreenCenterX, ScreenCenterY), float(def::AimbotFov), ImColor(0, 0, 0, 160), 220.0f);
+			ImGui::GetBackgroundDrawList()->AddCircle(ImVec2(ScreenCenterX, ScreenCenterY), float(def::AimbotFov), RGBtoU32(255, 255, 255), 220.0f, 0.5f);
+			bool square_fov = false;
+			bool fovcircle = false;
+		}
+		if (SquareFovFilled)
+		{
+			ImGui::GetBackgroundDrawList()->AddRect(ImVec2(ScreenCenterX - def::AimbotFov, ScreenCenterY - def::AimbotFov), ImVec2(ScreenCenterX + def::AimbotFov, ScreenCenterY + def::AimbotFov), RGBtoU32(255, 255, 255), 0.5f);
+			ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(ScreenCenterX - def::AimbotFov, ScreenCenterY - def::AimbotFov), ImVec2(ScreenCenterX + def::AimbotFov, ScreenCenterY + def::AimbotFov), ImColor(0, 0, 0, 160), 1.0f), 0.5f;
+		}
+	}
+	HitBoxAimKey();
+	auto entityListCopy = entityList;
+	float closestDistance = FLT_MAX;
+	DWORD_PTR closestPawn = NULL;
+
+	Uworld = KmDrv->Rpm<DWORD_PTR>(base_address + GWorld);
+	DWORD_PTR Gameinstance = KmDrv->Rpm<DWORD_PTR>(Uworld + OFFSETS::Gameinstance);
+	DWORD_PTR LocalPlayers = KmDrv->Rpm<DWORD_PTR>(Gameinstance + OFFSETS::LocalPlayers);
+	Localplayer = KmDrv->Rpm<DWORD_PTR>(LocalPlayers);
+	PlayerController = KmDrv->Rpm<DWORD_PTR>(Localplayer + OFFSETS::PlayerController);
+	LocalPawn = KmDrv->Rpm<DWORD_PTR>(PlayerController + OFFSETS::LocalPawn);
+	PlayerState = KmDrv->Rpm<DWORD_PTR>(LocalPawn + OFFSETS::PlayerState);
+	DWORD_PTR PlayerCameraManager = KmDrv->Rpm<DWORD_PTR>(PlayerController + OFFSETS::PlayerCameraManager);
+	PlayerCameraManager = KmDrv->Rpm<DWORD_PTR>(LocalPawn + PlayerCameraManager);
+	Rootcomp = KmDrv->Rpm<DWORD_PTR>(LocalPawn + OFFSETS::RootComponet);
+	DWORD_PTR GameState = KmDrv->Rpm<DWORD_PTR>(Uworld + OFFSETS::GameState);//gamestate
+	DWORD_PTR PlayerArray = KmDrv->Rpm<DWORD_PTR>(GameState + OFFSETS::PlayerArray);//playerarray
+
+	bool InLobby;
+	InLobby = false;
+	if (LocalPawn) InLobby = true;
+	for (int i = 0; i < def::VisDist; i++)
+	{
+		auto player = KmDrv->Rpm<uintptr_t>(PlayerArray + i * 0x8);
+		auto CurrentActor = KmDrv->Rpm<uintptr_t>(player + OFFSETS::CurrentActor);//PawnPrivate
+
+		if (!CurrentActor) {
+			continue;
+		}
+		uint64_t CurrentActorMesh = KmDrv->Rpm<uint64_t>(CurrentActor + OFFSETS::Mesh);
+		int MyTeamId = KmDrv->Rpm<int>(PlayerState + OFFSETS::TeamId);
+		DWORD64 otherPlayerState = KmDrv->Rpm<uint64_t>(CurrentActor + 0x290);
+		int ActorTeamId = KmDrv->Rpm<int>(otherPlayerState + OFFSETS::TeamId);
+		auto entityListCopy = entityList;
+		if (MyTeamId == ActorTeamId) continue;
+		if (slefESP)
+		{
+			continue;
+		}
+		else {
+			if (CurrentActor == LocalPawn) continue;
+		}
+		if (CurrentActor == LocalPawn) continue;
+		Vector3 Headpos = GetBoneWithRotation(CurrentActorMesh, 68);
+		Vector3 footpos = GetBoneWithRotation(CurrentActorMesh, 0);
+		localactorpos = KmDrv->Rpm<Vector3>(Rootcomp + 0x128);
+		auto normal_head = ProjectWorldToScreen(Headpos);
+		float distance = localactorpos.Distance(Headpos) / ChangerFOV;
+		Vector3 bone66 = GetBoneWithRotation(CurrentActorMesh, 66);
+		Vector3 top = ProjectWorldToScreen(bone66);
+		Vector3 bone0 = GetBoneWithRotation(CurrentActorMesh, 0);
+		Vector3 bottom = ProjectWorldToScreen(bone0);
+		Vector3 Headbox = ProjectWorldToScreen(Vector3(Headpos.x, Headpos.y, Headpos.z + 15));
+		Vector3 HeadElvar = ProjectWorldToScreen(Vector3(Headpos.x, Headpos.y, Headpos.z));
+		Vector3 FeetElvar = ProjectWorldToScreen(Vector3(footpos.x, footpos.y, footpos.z));
+		Vector3 w2shead = ProjectWorldToScreen(Headpos);
+		Vector3 vHeadBone = GetBoneWithRotation(CurrentActorMesh, 68);
+		Vector3 vRootBone = GetBoneWithRotation(CurrentActorMesh, 0);
+		Vector3 vHeadBoneOut = ProjectWorldToScreen(Vector3(vHeadBone.x, vHeadBone.y, vHeadBone.z + 15));
+		Vector3 vRootBoneOut = ProjectWorldToScreen(vRootBone);
+		float BoxHeight = (float)(Headbox.y - bottom.y);
+		float BoxWidth = BoxHeight * 0.50f;
+		float LeftX = (float)Headbox.x - (BoxWidth / 1);
+		float LeftY = (float)bottom.y;
+		float CornerHeight = abs(Headbox.y - bottom.y);
+		float CornerWidth = CornerHeight * BoxWidthValue;
+		if (distance < def::VisDist)
+		{
+			if (Esp)
+			{
+				if (fillbox)
+				{
+					DrawCorneredBox(Headbox.x - (CornerWidth / 2), Headbox.y, CornerWidth, CornerHeight, RGBtoU32(255, 255, 255),Boxthinkness);
+					DrawFilledRect(Headbox.x - (CornerWidth / 2), Headbox.y, CornerWidth, CornerHeight, ImColor(0, 0, 0, 125));
+				}
+				if (CornerBoxEsp)
+				{
+					DrawCorneredBox(Headbox.x - (CornerWidth / 2), Headbox.y, CornerWidth, CornerHeight, RGBtoU32(255, 255, 255), Boxthinkness);
+				}
+				if (BoxEsp)
+				{
+					DrawBox(Headbox.x - (CornerWidth / 2), Headbox.y, CornerWidth, CornerHeight, RGBtoU32(255, 255, 255), Boxthinkness);
+				}
+				if (Snaplines)
+				{
+					DrawLine(Width / 2 - 0, Height / 2 - 540, bottom.x, bottom.y, &Col.white, 0.5);
+				}
+				if (WindowStreamProof) {
+					SetWindowDisplayAffinity(Window, WDA_EXCLUDEFROMCAPTURE);
+				}
+				if (!WindowStreamProof) {
+					SetWindowDisplayAffinity(Window, !WDA_EXCLUDEFROMCAPTURE);
+				}
+				if (PlayerDistanceEsp)
+				{
+					char name[64];
+					sprintf_s(name, skCrypt("[%2.fm]"), distance);
+					DrawString(16, Headbox.x, Headbox.y - 15, &Col.white, true, true, name);
+				}
+				if (ThreeDBoxEsp)
+				{
+					if (vHeadBoneOut.x != 0 || vHeadBoneOut.y != 0 || vHeadBoneOut.z != 0)
+					{
+						ImU32 ESPSkeleton;
+						if (isVisible(CurrentActorMesh))
+						{
+							ESPSkeleton = RGBtoU32(255, 255, 255);
+						}
+						else if (!isVisible(CurrentActorMesh))
+						{
+							ESPSkeleton = RGBtoU32(255, 0, 0);
+						}
+						Vector3 bottom1 = ProjectWorldToScreen(Vector3(vRootBone.x + 40, vRootBone.y - 40, vRootBone.z));
+						Vector3 bottom2 = ProjectWorldToScreen(Vector3(vRootBone.x - 40, vRootBone.y - 40, vRootBone.z));
+						Vector3 bottom3 = ProjectWorldToScreen(Vector3(vRootBone.x - 40, vRootBone.y + 40, vRootBone.z));
+						Vector3 bottom4 = ProjectWorldToScreen(Vector3(vRootBone.x + 40, vRootBone.y + 40, vRootBone.z));
+						Vector3 top1 = ProjectWorldToScreen(Vector3(vHeadBone.x + 40, vHeadBone.y - 40, vHeadBone.z + 15));
+						Vector3 top2 = ProjectWorldToScreen(Vector3(vHeadBone.x - 40, vHeadBone.y - 40, vHeadBone.z + 15));
+						Vector3 top3 = ProjectWorldToScreen(Vector3(vHeadBone.x - 40, vHeadBone.y + 40, vHeadBone.z + 15));
+						Vector3 top4 = ProjectWorldToScreen(Vector3(vHeadBone.x + 40, vHeadBone.y + 40, vHeadBone.z + 15));
+						ImGui::GetBackgroundDrawList()->AddLine(ImVec2(bottom1.x, bottom1.y), ImVec2(top1.x, top1.y), ESPSkeleton, 0.5f);
+						ImGui::GetBackgroundDrawList()->AddLine(ImVec2(bottom2.x, bottom2.y), ImVec2(top2.x, top2.y), ESPSkeleton, 0.5f);
+						ImGui::GetBackgroundDrawList()->AddLine(ImVec2(bottom3.x, bottom3.y), ImVec2(top3.x, top3.y), ESPSkeleton, 0.5f);
+						ImGui::GetBackgroundDrawList()->AddLine(ImVec2(bottom4.x, bottom4.y), ImVec2(top4.x, top4.y), ESPSkeleton, 0.5f);
+						ImGui::GetBackgroundDrawList()->AddLine(ImVec2(bottom1.x, bottom1.y), ImVec2(bottom2.x, bottom2.y), ESPSkeleton, 0.5f);
+						ImGui::GetBackgroundDrawList()->AddLine(ImVec2(bottom2.x, bottom2.y), ImVec2(bottom3.x, bottom3.y), ESPSkeleton, 0.5f);
+						ImGui::GetBackgroundDrawList()->AddLine(ImVec2(bottom3.x, bottom3.y), ImVec2(bottom4.x, bottom4.y), ESPSkeleton, 0.5f);
+						ImGui::GetBackgroundDrawList()->AddLine(ImVec2(bottom4.x, bottom4.y), ImVec2(bottom1.x, bottom1.y), ESPSkeleton, 0.5f);
+						ImGui::GetBackgroundDrawList()->AddLine(ImVec2(top1.x, top1.y), ImVec2(top2.x, top2.y), ESPSkeleton, 0.5f);
+						ImGui::GetBackgroundDrawList()->AddLine(ImVec2(top2.x, top2.y), ImVec2(top3.x, top3.y), ESPSkeleton, 0.5f);
+						ImGui::GetBackgroundDrawList()->AddLine(ImVec2(top3.x, top3.y), ImVec2(top4.x, top4.y), ESPSkeleton, 0.5f);
+						ImGui::GetBackgroundDrawList()->AddLine(ImVec2(top4.x, top4.y), ImVec2(top1.x, top1.y), ESPSkeleton, 0.5f);
+					}
+				}
+			}
+		}
+		auto dx = w2shead.x - (Width / 2);
+		auto dy = w2shead.y - (Height / 2);
+		auto dist = sqrtf(dx * dx + dy * dy);
+
+		if (isVisible(CurrentActorMesh)) {
+
+			if (dist < def::AimbotFov && dist < closestDistance) {
+				closestDistance = dist;
+				closestPawn = CurrentActor;
+
+			}
+		}
+	}
+
+	if (def::Aimbot)
+	{
+		if (keybind == 0) 
+		{
+			if (def::Aimbot && closestPawn && GetAsyncKeyState(VK_RBUTTON) < 0) {
+				AimAt(closestPawn);
+			}
+		}
+		if (keybind == 1)
+		{
+			if (def::Aimbot && closestPawn && GetAsyncKeyState(VK_LBUTTON) < 0) {
+				AimAt(closestPawn);
+			}
+		}
+		if (keybind == 2)
+		{
+			if (def::Aimbot && closestPawn && GetAsyncKeyState(VK_MBUTTON) < 0) {
+				AimAt(closestPawn);
+			}
+		}
+	}
+}
+void render() {
+	switch (keybind)
+	{
+	case 0:
+		def::aimkeypos = 1;
+		break;
+	case 1:
+		def::aimkeypos = 0;
+		break;
+	case 2:
+		def::aimkeypos = 2;
+		break;
+	}
+	if (RenderOption == 0)
+	{
+		fovcirclefilled = false;
+		square_fov = false;
+		fovcircle = true;
+		SquareFovFilled = false;
+	}
+	if (RenderOption == 1)
+	{
+		fovcircle = false;
+		fovcirclefilled = false;
+		square_fov = true;		
+		SquareFovFilled = false;
+	}
+	if (RenderOption == 2)
+	{
+		square_fov = false;
+		fovcircle = false;
+		fovcirclefilled = true;
+		SquareFovFilled = false;
+	}
+	if (RenderOption == 3)
+	{
+		square_fov = false;
+		fovcircle = false;
+		fovcirclefilled = false;
+		SquareFovFilled = true;
+	}
+	ImGui_ImplDX9_NewFrame();
+	ImGui_ImplWin32_NewFrame();
+	ImGui::NewFrame();
+	DrawESP();
+	XorS(aimlolip, "Aimbot");
+	XorS(wintitle, "External");
+	XorS(esplol, "ESP");
+	if (GetAsyncKeyState(VK_INSERT) & 1) {
+		ShowMenu = !ShowMenu;
+	}
+	if (ShowMenu)
+	{
+		ImGui::SetNextWindowSize(ImVec2(630.000f, 410.000f), ImGuiCond_Once);
+		ImGui::Begin(wintitle.decrypt(), NULL, 34);
+		ImDrawList* pDrawList;
+		const auto& CurrentWindowPos = ImGui::GetWindowPos();
+		const auto& pWindowDrawList = ImGui::GetWindowDrawList();
+		const auto& pBackgroundDrawList = ImGui::GetBackgroundDrawList();
+		const auto& pForegroundDrawList = ImGui::GetForegroundDrawList();
+
+		ImGui::SetCursorPos(ImVec2(8.000f, 25.000f));
+		if (ImGui::Button(skCrypt("Aim Options"), ImVec2(120.000f, 30.000f)))
+		{
+			tab = 1;
+		}
+
+		ImGui::SetCursorPos(ImVec2(8.000f, 59.000f));
+		if (ImGui::Button(skCrypt("Visual Options"), ImVec2(120.000f, 30.000f)))
+        {
+			tab = 2;
+		}
+
+		switch (tab)
+		{
+		case 1:
+
+
+			ImGui::SetCursorPos(ImVec2(223.000f, 27.000f));
+			ImGui::Checkbox(aimlolip.decrypt(), &def::Aimbot);
+
+
+			ImGui::SetCursorPos(ImVec2(223.000f, 50.000f));
+			ImGui::Checkbox(skCrypt("FOV Circle"), &circletype);
+			ImGui::SetNextItemWidth(150.000f);
+			ImGui::SameLine();
+
+			ImGui::Combo(skCrypt(""), &RenderOption, skCrypt("Circle\0Square\0Filled Circle\0Filled Square\0"));
+			ImGui::SetNextItemWidth(150.000f);
+
+			ImGui::SetCursorPos(ImVec2(223.000f, 73.000f));
+			ImGui::SliderInt(skCrypt("Esp Distance"), &def::VisDist, 50, 300);
+
+			ImGui::SetNextItemWidth(150.000f);
+			ImGui::SetCursorPos(ImVec2(223.000f, 96.000f));
+			ImGui::SliderFloat(skCrypt("FOV Size"), &def::AimbotFov, 50, 800);
+
+			ImGui::SetNextItemWidth(150.000f);
+			ImGui::SetCursorPos(ImVec2(223.000f, 119.000f));
+			ImGui::SliderFloat(skCrypt("Smoothness"), &Smoothness, 2.000f, 10.000f);
+
+			ImGui::SetNextItemWidth(150.000f);
+			ImGui::SetCursorPos(ImVec2(223.000f, 142.000f));
+			ImGui::Combo(skCrypt("Aim Key"), &keybind, skCrypt("Right Mouse\0Left Mouse\0Middle Mouse\0"));
+
+			ImGui::SetNextItemWidth(150.000f);
+			ImGui::SetCursorPos(ImVec2(223.000f, 165.000f));
+			ImGui::Combo(skCrypt("Aimbone"), &def::hitboxpos, hitboxes, sizeof(hitboxes) / sizeof(*hitboxes));
+
+			ImGui::SetNextItemWidth(150.000f);
+			ImGui::SetCursorPos(ImVec2(223.000f, 195.000f));
+			ImGui::Checkbox(skCrypt("StreamProof"), &WindowStreamProof);
+			
+			ImGui::SetCursorPos(ImVec2(223.000f, 50.000f));
+			break;
+		    case 2:
+			ImGui::SetCursorPos(ImVec2(223.000f, 27.000f));
+			ImGui::Checkbox(skCrypt("Box Esp"), &BoxEsp);
+
+			ImGui::SetCursorPos(ImVec2(223.000f, 50.000f));
+			ImGui::Checkbox(skCrypt("CornerBox Esp"), &CornerBoxEsp);
+
+			ImGui::SetCursorPos(ImVec2(223.000f, 73.000f));
+			ImGui::Checkbox(skCrypt("CornerBox Filled Esp"), &fillbox);
+
+			ImGui::SetCursorPos(ImVec2(223.000f, 96.000f));
+			ImGui::Checkbox(skCrypt("3D Box Esp"), &ThreeDBoxEsp);
+
+			ImGui::SetCursorPos(ImVec2(223.000f, 142.000f));
+			ImGui::Checkbox(skCrypt("Distance"), &PlayerDistanceEsp);
+
+			ImGui::SetCursorPos(ImVec2(223.000f, 188.000f));
+			ImGui::Checkbox(skCrypt("Snaplines"), &Snaplines);
+
+			ImGui::SetCursorPos(ImVec2(223.000f, 234.000f));
+			ImGui::Checkbox(skCrypt("Thickness"), &thick);
+			if (thick)
+			{
+				ImGui::SetNextItemWidth(150.000f);
+				ImGui::SetCursorPos(ImVec2(223.000f, 257.000f));
+				ImGui::SliderInt(skCrypt("Line Thickness"), &LineThinkness, 1, 10);
+				ImGui::SetNextItemWidth(150.000f);
+				ImGui::SetCursorPos(ImVec2(223.000f, 280.000f));
+				ImGui::SliderInt(skCrypt("Box Thickness"), &Boxthinkness, 1, 10);
+				ImGui::SetNextItemWidth(150.000f);
+				ImGui::SetCursorPos(ImVec2(223.000f, 325.000f));
+				ImGui::SliderFloat(skCrypt("Box Width"), &BoxWidthValue, 0.40, 25.f);
+			}
+			break;
+		}
+	}
+	
+
+	ImGui::EndFrame();
+	D3dDevice->SetRenderState(D3DRS_ZENABLE, false);
+	D3dDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, false);
+	D3dDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, false);
+	D3dDevice->Clear(0, NULL, D3DCLEAR_TARGET, D3DCOLOR_ARGB(0, 0, 0, 0), 1.0f, 0);
+
+	if (D3dDevice->BeginScene() >= 0)
+	{
+		ImGui::Render();
+		ImGui_ImplDX9_RenderDrawData(ImGui::GetDrawData());
+		D3dDevice->EndScene();
+	}
+	HRESULT result = D3dDevice->Present(NULL, NULL, NULL, NULL);
+
+	if (result == D3DERR_DEVICELOST && D3dDevice->TestCooperativeLevel() == D3DERR_DEVICENOTRESET)
+	{
+		ImGui_ImplDX9_InvalidateDeviceObjects();
+		D3dDevice->Reset(&d3dpp);
+		ImGui_ImplDX9_CreateDeviceObjects();
+	}
+}
+
+
+
+int Loop = 0;
+void xMainLoop()
+{
+	MSG Message;
+	RtlZeroMemory(&Message, sizeof(Message));
+
+	while ((Message.message != WM_QUIT) /* && (dt_info->tm_mday == DAY) */)
+	{
+		if (PeekMessageA(&Message, NULL, 0, 0, PM_REMOVE))
+		{
+			TranslateMessage(&Message);
+			DispatchMessageA(&Message);
+			continue;
+		}
+		HWND hwnd_active = GetForegroundWindow();
+		if (hwnd_active == hwnd) {
+			HWND hwndtest = GetWindow(hwnd_active, GW_HWNDPREV);
+			SetWindowPos(Window, hwndtest, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
+		}
+		RECT rc;
+		POINT xy;
+		ZeroMemory(&rc, sizeof(RECT));
+		ZeroMemory(&xy, sizeof(POINT));
+		GetClientRect(hwnd, &rc);
+		ClientToScreen(hwnd, &xy);
+		rc.left = xy.x;
+		rc.top = xy.y;
+
+		ImGuiIO& io = ImGui::GetIO();
+		io.IniFilename = NULL;
+		io.ImeWindowHandle = hwnd;
+		io.DeltaTime = 1.0f / 60.0f;
+
+		POINT p;
+		GetCursorPos(&p);
+		io.MousePos.x = p.x - xy.x;
+		io.MousePos.y = p.y - xy.y;
+
+		if (GetAsyncKeyState(VK_LBUTTON)) {
+			io.MouseDown[0] = true;
+			io.MouseClicked[0] = true;
+			io.MouseClickedPos[0].x = io.MousePos.x;
+			io.MouseClickedPos[0].x = io.MousePos.y;
+		}
+		else
+			io.MouseDown[0] = false;
+		render();;
+	}
+	ImGui_ImplDX9_Shutdown();
+	ImGui_ImplWin32_Shutdown();
+	ImGui::DestroyContext();
+	DestroyWindow(Window);
+}
